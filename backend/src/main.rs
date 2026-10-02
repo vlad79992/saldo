@@ -4,7 +4,7 @@ use axum::{
     http::{HeaderValue, StatusCode, header},
     middleware::{self, Next},
     response::Response,
-    routing::{delete, get, post, put},
+    routing::get,
 };
 use chrono::{NaiveDate, NaiveDateTime};
 use rust_decimal::Decimal;
