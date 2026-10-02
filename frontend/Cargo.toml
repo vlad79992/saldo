@@ -1,13 +1,22 @@
 [package]
 name = "frontend"
 version = "0.1.0"
-edition = "2021"
+edition = "2024"
+rust-version = "1.83"
 
 [dependencies]
-dioxus = "0.6"
-gloo-net = "0.5"
+# Dioxus 0.7: в release-сборке отключаем devtools (в WASM-бандл не попадает websocket-код),
+# logger оставляем — dioxus::launch() при включённой фиче "logger" сам инициализирует panic hook.
+dioxus = { version = "0.7", default-features = false, features = ["web", "launch", "logger"] }
+gloo-net = { version = "0.7", default-features = false, features = ["http", "json"] }
 serde = { version = "1", features = ["derive"] }
-chrono = { version = "0.4", features = ["serde", "wasmbind"] }
-rust_decimal = { version = "1", features = ["serde"] }
-console_error_panic_hook = "0.1"
+chrono = { version = "0.4", default-features = false, features = ["std", "clock", "serde", "wasmbind"] }
+rust_decimal = { version = "1", default-features = false, features = ["serde-str", "db-postgres"] }
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
 web-sys = { version = "0.3", features = ["console"] }
+
+[features]
+# В dev-режиме (trunk serve / dx serve) можно включить devtools: --features devtools
+default = []
+devtools = ["dioxus/devtools"]
