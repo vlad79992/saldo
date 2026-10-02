@@ -1,12 +1,82 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ru">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Сальдо на Rust</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+<meta charset="utf-8">
+<title>Учет ЖКУ — лицевые счета</title>
+<link rel="stylesheet" href="/style.css">
 </head>
 <body>
-    <div id="main"></div>
+<h1>Учет начислений и платежей ЖКУ</h1>
+<nav>
+  <button class="tab active" data-tab="saldo">Сальдо</button>
+  <button class="tab" data-tab="charges">Начисления</button>
+  <button class="tab" data-tab="payments">Платежи</button>
+  <button class="tab" data-tab="reports">Отчеты</button>
+</nav>
+
+<section id="tab-saldo" class="page active">
+  <form id="form-saldo">
+    <input type="hidden" name="id">
+    <label>Лицевой счет <input name="account_number" required></label>
+    <label>Конец периода <input type="date" name="period_date" required></label>
+    <label>Сумма <input type="number" step="0.01" name="amount" required></label>
+    <label class="chk"><input type="checkbox" name="is_base"> входящее (старт цепочки)</label>
+    <button type="submit">Сохранить</button>
+    <button type="button" class="cancel" hidden>Отмена</button>
+  </form>
+  <p class="hint">Исходящее сальдо месяца рассчитывается автоматически: входящее + начисления − платежи.
+     Входящее сальдо следующего месяца = исходящее текущего. Вручную задается только стартовая строка счета.</p>
+  <div id="grid-saldo"></div>
+</section>
+
+<section id="tab-charges" class="page">
+  <form id="form-charges">
+    <input type="hidden" name="id">
+    <label>Лицевой счет <input name="account_number" required></label>
+    <label>Услуга <input name="service_type" value="ЖКУ"></label>
+    <label>Дата и время <input type="datetime-local" step="1" name="charge_date" required></label>
+    <label>Сумма <input type="number" step="0.01" name="amount" required></label>
+    <button type="submit">Сохранить</button>
+    <button type="button" class="cancel" hidden>Отмена</button>
+  </form>
+  <div id="grid-charges"></div>
+</section>
+
+<section id="tab-payments" class="page">
+  <form id="form-payments">
+    <input type="hidden" name="id">
+    <label>Лицевой счет <input name="account_number" required></label>
+    <label>Дата и время платежа <input type="datetime-local" step="1" name="payment_date" required></label>
+    <label>Сумма <input type="number" step="0.01" name="amount" required></label>
+    <label>Способ <input name="payment_method" value="Банк"></label>
+    <button type="submit">Сохранить</button>
+    <button type="button" class="cancel" hidden>Отмена</button>
+  </form>
+  <div id="grid-payments"></div>
+</section>
+
+<section id="tab-reports" class="page">
+  <div class="rep-block">
+    <h3>1. Оборотная ведомость (все квартиры)</h3>
+    <label>Год <input type="number" id="rep1-year" value="2017"></label>
+    <button id="rep1-btn">Показать</button>
+    <div id="rep1-out"></div>
+  </div>
+  <div class="rep-block">
+    <h3>2. Оборотная ведомость по квартире</h3>
+    <label>Счет <select id="rep2-acc"></select></label>
+    <label>С <input type="date" id="rep2-from" value="2017-01-01"></label>
+    <label>По <input type="date" id="rep2-to" value="2017-12-31"></label>
+    <button id="rep2-btn">Показать</button>
+    <div id="rep2-out"></div>
+  </div>
+  <div class="rep-block">
+    <h3>3. Сводка по категориям должников</h3>
+    <label>На дату <input type="date" id="rep3-asof" value="2017-10-01"></label>
+    <button id="rep3-btn">Показать</button>
+    <div id="rep3-out"></div>
+  </div>
+</section>
+<script src="/app.js"></script>
 </body>
 </html>

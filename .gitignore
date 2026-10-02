@@ -1,2 +1,2 @@
 # Rust build artifacts
-target/
+backend/target/
