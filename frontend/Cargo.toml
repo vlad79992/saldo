@@ -1,0 +1,13 @@
+[package]
+name = "frontend"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+dioxus = "0.6"
+gloo-net = "0.5"
+serde = { version = "1", features = ["derive"] }
+chrono = { version = "0.4", features = ["serde", "wasmbind"] }
+rust_decimal = { version = "1", features = ["serde"] }
+console_error_panic_hook = "0.1"
+web-sys = { version = "0.3", features = ["console"] }

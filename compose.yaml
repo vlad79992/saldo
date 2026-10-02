@@ -1,0 +1,45 @@
+services:
+  saldo:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      - DATABASE_URL=postgres://saldo:saldo@postgres:5432/saldo
+      - RUST_LOG=info
+    networks:
+      - app-network
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:latest
+    container_name: saldo_db
+    environment:
+      POSTGRES_DB: saldo
+      POSTGRES_USER: saldo
+      POSTGRES_PASSWORD: saldo
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U saldo -d saldo"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+
+networks:
+  app-network:
+    driver: bridge
