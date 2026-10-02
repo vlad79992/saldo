@@ -13,9 +13,9 @@ struct SaldoRecord {
 }
 
 fn main() {
-    // Инициализируем panic hook для лучшей отладки WASM
-    console_error_panic_hook::set_once();
-    launch(App);
+    // Dioxus 0.7: вместо launch(...) — dioxus::launch(App);
+    // panic hook инициализируется автоматически фичей "logger"
+    dioxus::launch(App);
 }
 
 #[component]

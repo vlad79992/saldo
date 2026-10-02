@@ -1,16 +1,25 @@
 [package]
 name = "saldo"
 version = "0.1.0"
-edition = "2021"
+edition = "2024"
+rust-version = "1.85"
 
 [dependencies]
-axum = "0.7"
-tokio = { version = "1", features = ["full"] }
+# Axum 0.8: в маршрутах префиксы путей теперь обязательны ("/api/saldo" вместо пары nest+route)
+axum = { version = "0.8", features = ["http1", "http2"] }
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "signal", "net"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-sqlx = { version = "0.7", features = ["runtime-tokio-rustls", "postgres", "chrono", "rust_decimal"] }
-chrono = { version = "0.4", features = ["serde"] }
-rust_decimal = { version = "1", features = ["serde"] }
+# sqlx 0.8: фича runtime-tokio-rustls заменена на независимые runtime-tokio + tls-rustls
+sqlx = { version = "0.8", features = ["runtime-tokio", "tls-rustls", "postgres", "chrono", "rust_decimal"] }
+chrono = { version = "0.4", default-features = false, features = ["std", "clock", "serde"] }
+rust_decimal = { version = "1", features = ["serde-with-float", "db-postgres"] }
 tracing = "0.1"
-tracing-subscriber = "0.3"
-tower-http = { version = "0.5", features = ["fs", "cors"] }
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+# tower-http 0.6: set-header + util — кастомный MakeHeaderValue для ServeDir:
+# no-cache для index.html, чтобы браузер всегда получал свежий WASM-бандл
+# (хэшированные ассеты кэшируются на год). В 0.6 у ServeDir нет метода
+# insert_response_header_if — вместо него ServiceExt::set_response_header.
+tower-http = { version = "0.6", features = ["fs", "cors", "set-header", "util"] }
+tower = "0.5"
+http-body = "1"
