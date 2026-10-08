@@ -17,19 +17,43 @@ document.querySelectorAll('.tab').forEach(b => b.onclick = () => {
   b.classList.add('active'); $('#tab-' + b.dataset.tab).classList.add('active');
 });
 
+// Преобразование даты: конец периода → начало следующего месяца (для отображения)
+function toDisplayDate(periodDate) {
+  if (!periodDate) return '';
+  const d = new Date(periodDate);
+  d.setDate(d.getDate() + 1);
+  return d.toISOString().split('T')[0];
+}
+
+// Преобразование даты: начало периода → конец предыдущего месяца (для сохранения)
+function toStorageDate(displayDate) {
+  if (!displayDate) return '';
+  const d = new Date(displayDate);
+  d.setDate(d.getDate() - 1);
+  return d.toISOString().split('T')[0];
+}
+
 const CRUD = {
   saldo: {
     url: '/api/saldo',
-    head: ['Счет', 'Конец периода', 'Сальдо (исх.)', 'Входящее?', ''],
-    view: r => [r.account_number, r.period_date, fmt(r.amount), r.is_base ? 'да' : '—'],
-    load: (f, r) => { f.account_number.value = r.account_number; f.period_date.value = r.period_date; f.amount.value = r.amount; f.is_base.checked = r.is_base; },
-    data: f => ({ account_number: f.account_number.value, period_date: f.period_date.value, amount: f.amount.value, is_base: f.is_base.checked })
+    head: ['Счет', 'Начало периода', 'Сальдо (вх.)', ''],
+    view: r => [r.account_number, toDisplayDate(r.period_date), fmt(r.amount)],
+    load: (f, r) => {
+      f.account_number.value = r.account_number;
+      f.period_date.value = toDisplayDate(r.period_date);
+      f.amount.value = r.amount;
+    },
+    data: f => ({
+      account_number: f.account_number.value,
+      period_date: toStorageDate(f.period_date.value),
+      amount: f.amount.value
+    })
   },
   charges: {
     url: '/api/charges',
-    head: ['Счет', 'Услуга', 'Дата и время', 'Сумма', ''],
-    view: r => [r.account_number, r.service_type || '', String(r.charge_date).replace('T', ' '), fmt(r.amount)],
-    load: (f, r) => { f.account_number.value = r.account_number; f.service_type.value = r.service_type || ''; f.charge_date.value = String(r.charge_date).replace(' ', 'T'); f.amount.value = r.amount; },
+    head: ['Счет', 'Услуга', 'Дата', 'Сумма', ''],
+    view: r => [r.account_number, r.service_type || '', String(r.charge_date).split(' ')[0], fmt(r.amount)],
+    load: (f, r) => { f.account_number.value = r.account_number; f.service_type.value = r.service_type || ''; f.charge_date.value = String(r.charge_date).split(' ')[0]; f.amount.value = r.amount; },
     data: f => ({ account_number: f.account_number.value, service_type: f.service_type.value || null, charge_date: f.charge_date.value, amount: f.amount.value })
   },
   payments: {
@@ -109,7 +133,6 @@ function monthHeaders(rows) {
 }
 
 // ===== ОТЧЕТ 1: оборотная ведомость (все квартиры) =====
-// 4 строки на квартиру: Вх.сальдо / Начис. / Опл. / Исх.сальдо
 $('#rep1-btn').onclick = async () => {
   try {
     const rows = await api('/api/reports/turnover?year=' + $('#rep1-year').value);

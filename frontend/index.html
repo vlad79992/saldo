@@ -18,14 +18,14 @@
   <form id="form-saldo">
     <input type="hidden" name="id">
     <label>Лицевой счет <input name="account_number" required></label>
-    <label>Конец периода <input type="date" name="period_date" required></label>
+    <label>Начало периода <input type="date" name="period_date" required></label>
     <label>Сумма <input type="number" step="0.01" name="amount" required></label>
-    <label class="chk"><input type="checkbox" name="is_base"> входящее (старт цепочки)</label>
     <button type="submit">Сохранить</button>
     <button type="button" class="cancel" hidden>Отмена</button>
   </form>
-  <p class="hint">Исходящее сальдо месяца рассчитывается автоматически: входящее + начисления − платежи.
-     Входящее сальдо следующего месяца = исходящее текущего. Вручную задается только стартовая строка счета.</p>
+  <p class="hint">Входящее сальдо задаётся на начало месяца.
+     Исходящее сальдо месяца рассчитывается автоматически: входящее + начисления − платежи.
+     Входящее сальдо следующего месяца = исходящее текущего.</p>
   <div id="grid-saldo"></div>
 </section>
 
@@ -34,7 +34,7 @@
     <input type="hidden" name="id">
     <label>Лицевой счет <input name="account_number" required></label>
     <label>Услуга <input name="service_type" value="ЖКУ"></label>
-    <label>Дата и время <input type="datetime-local" step="1" name="charge_date" required></label>
+    <label>Дата <input type="date" name="charge_date" required></label>
     <label>Сумма <input type="number" step="0.01" name="amount" required></label>
     <button type="submit">Сохранить</button>
     <button type="button" class="cancel" hidden>Отмена</button>
